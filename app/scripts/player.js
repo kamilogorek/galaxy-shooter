@@ -188,4 +188,6 @@ define(['game', 'scene', 'viewport', 'layout', 'asteroids'], function (game, sce
     };
 
     return Player;
+
+    // TODO: Remove bower deps from, add it back to ignore and add proper build
 });
