@@ -1,11 +1,19 @@
+'use strict';
+
 require.config({
     paths: {
-        solpeo: 'libs/solpeo-engine'
+        lodash: 'bower_components/lodash/lodash'
     }
 });
 
-require(['app'], function (app) {
-    'use strict';
-    // use app here
-    console.log(app);
+require(['game', 'background', 'player'], function (game, background, player) {
+    background.init();
+    player.init();
+
+    game.on('gameover', function () {
+        setTimeout(function () {
+            background.init();
+            player.create();
+        }, 2000);
+    });
 });
