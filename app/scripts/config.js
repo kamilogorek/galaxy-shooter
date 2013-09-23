@@ -53,7 +53,7 @@ define(function () {
             y: 20,
             x: 20
         }
-    }
+    };
 
     return config;
 });

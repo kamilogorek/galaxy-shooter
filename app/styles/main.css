@@ -52,11 +52,10 @@ body {
     z-index: 2;
     text-align: center;
     font-size: 32px;
-    padding-top: 1em;
 }
 
 .start-screen .game-title {
-    margin-bottom: 2.5em;
+    margin-bottom: 3.2em;
 }
 
 .start-game {
@@ -64,24 +63,23 @@ body {
 }
 
 .copyright {
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .disclaimer {
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: 11px;
+    line-height: 1.6;
 }
 
 .end-screen {
     z-index: 2;
     text-align: center;
     font-size: 32px;
-    padding-top: 1em;
     display: none;
 }
 
 .end-screen .game-title {
-    margin-bottom: 1.5em;
+    margin-bottom: 1.75em;
 }
 
 .end-screen h3 {
@@ -94,7 +92,7 @@ body {
 }
 
 .restart-game {
-    margin-bottom: 5.85em;
+    margin-bottom: 7.05em;
 }
 
 .button {
@@ -119,6 +117,6 @@ body {
 .button:active {
     background: #fff;
     color: #000;
-    top: 5px;
-    left: -5px;
+    top: 3px;
+    left: -3px;
 }

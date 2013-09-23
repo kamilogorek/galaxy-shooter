@@ -5,21 +5,28 @@ define(['config', 'game', 'scene'], function (config, game, scene) {
     var ui = {};
 
     ui.init = function () {
-        this.lives = [];
+        this.livesIcons = [];
+        this.livesLeft = config.ship.lives;
         this.score = 0;
+        this.updateScore(0);
         this.drawLives();
-        this.bindEvents();
+
+        if (!this.eventsBound) {
+            this.bindEvents();
+        }
     };
 
     ui.bindEvents = function () {
         var _this = this;
 
+        this.eventsBound = true;
+
         game.on('shipDestroyed', function () {
-            if (config.ship.lives) {
+            if (this.livesLeft) {
                 _this.drawLives();
             } else {
                 // Remove last life from UI
-                _this.lives.pop().destroy();
+                _this.livesIcons.pop().destroy();
             }
         });
 
@@ -29,12 +36,12 @@ define(['config', 'game', 'scene'], function (config, game, scene) {
     };
 
     ui.drawLives = function () {
-        while (this.lives.length) {
-            this.lives.pop().destroy();
+        while (this.livesIcons.length) {
+            this.livesIcons.pop().destroy();
         }
 
-        for (var i = 0; i < config.ship.lives; i++) {
-            this.lives.push(new Engine.Geometry.Rectangle({
+        for (var i = 0; i < this.livesLeft; i++) {
+            this.livesIcons.push(new Engine.Geometry.Rectangle({
                 parent: scene,
                 width: config.ui.life.width,
                 height: config.ui.life.height,

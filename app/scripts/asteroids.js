@@ -1,14 +1,22 @@
 /* global define, Engine */
 'use strict';
 
-define(['config', 'game', 'scene', 'viewport'], function (config, game, scene, viewport) {
+define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game, scene, viewport, sounds) {
     var asteroids = {};
 
+    asteroids.instances = [];
+
     asteroids.init = function () {
-        this.instances = [];
+        while (this.instances.length) {
+            this.instances.pop().destroy();
+        }
+
         // Random number between 3 and 5
         this.generateAsteroids(Math.floor(Math.random() * (5 - 3 + 1)) + 3);
-        this.bindEvents();
+
+        if (!this.eventsBound) {
+            this.bindEvents();
+        }
     };
 
     asteroids.generateAsteroids = function (asteroidsNumber) {
@@ -51,6 +59,8 @@ define(['config', 'game', 'scene', 'viewport'], function (config, game, scene, v
     asteroids.bindEvents = function () {
         var _this = this;
 
+        this.eventsBound = true;
+
         game.on('step', function () {
             _this.instances.some(function (asteroid) {
                 asteroid.setPosition(asteroid.left, asteroid.top + asteroid.acc);
@@ -74,6 +84,9 @@ define(['config', 'game', 'scene', 'viewport'], function (config, game, scene, v
         // TODO: Increase min and max on timeInterval
 
         game.on('asteroidDestroyed', function (asteroid) {
+            sounds.asteroidDestroyed.stop();
+            sounds.asteroidDestroyed.play();
+
             new Engine.Particles({
                 parent: scene,
                 iterations: 10,

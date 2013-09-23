@@ -1,20 +1,33 @@
 /* global define, Engine */
 'use strict';
 
-define(['config', 'game', 'scene', 'viewport', 'asteroids', 'sounds'], function (config, game, scene, viewport, asteroids, sounds) {
+define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], function (config, game, scene, viewport, ui, asteroids, sounds) {
     var player = {};
     // TODO: Add mouse support
 
-    // TODO: Lighter color to particles after destroying ship
+    player.bullets = [];
 
     player.init = function () {
-        this.bullets = [];
+        // Restart positions
+        this.lastPosition = {
+            x: config.ship.lastPosition.x,
+            y: config.ship.lastPosition.y
+        };
+
         this.create();
-        this.bindEvents();
-        this.bindKeys();
+
+        if (!this.eventsBound) {
+            this.bindEvents();
+        }
+
+        if (!this.keysBound) {
+            this.bindKeys();
+        }
     };
 
     player.create = function () {
+        sounds.shipCreated.play();
+
         // Restart speed - key persistent bug
         config.ship.speed.x = 0;
         config.ship.speed.y = 0;
@@ -25,8 +38,8 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids', 'sounds'], function 
             name: 'ship',
             width: config.ship.width,
             height: config.ship.height,
-            left: config.ship.lastPosition.x,
-            top: config.ship.lastPosition.y,
+            left: this.lastPosition.x,
+            top: this.lastPosition.y,
             fill: config.ship.assets.default
         });
 
@@ -80,14 +93,14 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids', 'sounds'], function 
     };
 
     player.playerAsteroidCollision = function (asteroid) {
-        if (scene.ship === undefined) return;
-        if (scene.ship.invincible) return;
+        if (scene.ship === undefined) { return; }
+        if (scene.ship.invincible) { return; }
 
         if (Engine.Box.overlap(asteroid.left, asteroid.top, asteroid.width, asteroid.height,
             scene.ship.left, scene.ship.top, scene.ship.width, scene.ship.height)){
             // TODO: Add particles on game over
 
-            config.ship.lastPosition = {
+            this.lastPosition = {
                 x: scene.ship.left,
                 y: scene.ship.top
             };
@@ -99,8 +112,10 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids', 'sounds'], function 
     player.bindEvents = function () {
         var _this = this;
 
+        this.eventsBound = true;
+
         game.on('step', function () {
-            if (scene.ship === undefined) return;
+            if (scene.ship === undefined) { return; }
 
             var leftBorder = scene.ship.left + viewport.width / 2 < 0;
             var rightBorder = scene.ship.left + scene.ship.width + viewport.width/2 > viewport.width;
@@ -153,7 +168,9 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids', 'sounds'], function 
         });
 
         game.on('shipDestroyed', function (ship) {
-            config.ship.lives -= 1;
+            sounds.shipDestroyed.play();
+
+            ui.livesLeft -= 1;
             ship.destroy();
 
             new Engine.Particles({
@@ -165,7 +182,7 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids', 'sounds'], function 
                 left: ship.left,
                 top: ship.top,
                 amount: 20,
-                fill: 'rgb(168, 23, 23) 3px 3px',
+                fill: 'rgb(185, 75, 75) 3px 3px',
                 originX: ship.width / 2,
                 originY: ship.height / 2,
                 lifetime: 5000,
@@ -177,7 +194,7 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids', 'sounds'], function 
                 }
             });
 
-            if (config.ship.lives) {
+            if (ui.livesLeft) {
                 setTimeout(function () {
                     game.trigger('respawnPlayer');
                 }, 2000);
@@ -192,7 +209,7 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids', 'sounds'], function 
     };
 
     player.generateBullet = function () {
-        if (scene.ship === undefined) return;
+        if (scene.ship === undefined) { return; }
 
         var bullet = new Engine.Geometry.Rectangle({
             parent: scene,
@@ -213,8 +230,10 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids', 'sounds'], function 
     // TODO: Debug slowness after some time
 
     player.bindKeys = function () {
+        this.keysBound = true;
+
         Engine.Input.on('keydown', function (e) {
-            if (scene.ship === undefined) return;
+            if (scene.ship === undefined) { return; }
 
             switch (e.key) {
             case 'ARROW_LEFT':
@@ -238,7 +257,7 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids', 'sounds'], function 
         });
 
         Engine.Input.on('keyup', function (e) {
-            if (scene.ship === undefined) return;
+            if (scene.ship === undefined) { return; }
 
             switch (e.key) {
             case 'ARROW_LEFT':
