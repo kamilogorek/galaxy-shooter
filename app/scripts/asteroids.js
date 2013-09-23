@@ -1,31 +1,23 @@
 /* global define, Engine */
 'use strict';
 
-define(['game', 'scene', 'viewport', 'layout'], function (game, scene, viewport, layout) {
+define(['game', 'scene', 'viewport'], function (game, scene, viewport) {
     var asteroids = [];
-    var asteroidAcc = 5;
     var step = 0;
 
     game.on('loop', function () {
         ++step;
         // TODO: Check progress variable in docs
         if (step === 3) {
-            generateAsteroids(Math.round(Math.random() * 5));
+            // Random number between 3 and 5
+            generateAsteroids(Math.floor(Math.random() * (5 - 3 + 1)) + 3);
             step = 0;
         }
     });
 
+    // TODO: Increase min and max on timeInterval
+
     game.on('asteroidDestroyed', function (asteroid) {
-        var brick = {
-            left: 50,
-            top: 50,
-            width: 50,
-            height: 50,
-            color: 'red'
-        }
-
-        console.log(asteroid);
-
         new Engine.Particles({
             parent: scene,
             iterations: 10,
@@ -53,7 +45,6 @@ define(['game', 'scene', 'viewport', 'layout'], function (game, scene, viewport,
         var spacing = 15;
 
         for (var i = 0; i < asteroidsNumber; i++) {
-            // TODO: Add assets to asteroids
             // Random asteroids speed
             // Random asteroids size
             // Create small asteroids from a big one
@@ -68,26 +59,31 @@ define(['game', 'scene', 'viewport', 'layout'], function (game, scene, viewport,
             }
 
             var asteroid = new Engine.Geometry.Rectangle({
-                parent: layout,
+                parent: scene,
                 fill: 'image(images/meteorSmall.png)',
                 left: leftPos,
                 top: -viewport.height / 2 - 20,
                 width: assetWidth,
-                height: 42
+                height: 42,
             });
 
+            // Random number between 2 and 5
+            asteroid.acc = Math.floor(Math.random() * (5 - 2 + 1)) + 2;
+
             asteroids.push(asteroid);
-            scene.appendChild(asteroid);
         }
     }
 
-    generateAsteroids(5);
+    // Random number between 3 and 5
+    generateAsteroids(Math.floor(Math.random() * (5 - 3 + 1)) + 3);
 
     game.on('step', function () {
         asteroids.some(function (asteroid) {
-            asteroid.setPosition(asteroid.left, asteroid.top + asteroidAcc);
+            asteroid.setPosition(asteroid.left, asteroid.top + asteroid.acc);
         });
     });
+
+    // TODO: Add super powers (tripple shot, fast shot, bomb)
 
     return asteroids;
 });

@@ -6,14 +6,15 @@ require.config({
     }
 });
 
-require(['game', 'background', 'player'], function (game, background, player) {
+require(['game', 'background', 'player', 'ui'], function (game, background, player, ui) {
     background.init();
     player.init();
+    ui.init();
 
     game.on('gameover', function () {
-        setTimeout(function () {
-            background.init();
-            player.create();
-        }, 2000);
+        var msg = 'Game Over! Your score: ' + ui.score;
+        alert(msg);
+        // TODO: Reinit game
+        // start();
     });
 });
