@@ -1,6 +1,7 @@
 {
-  "name": "solpeo",
-  "version": "0.0.0",
+  "name": "Galaxy Shooter",
+  "version": "0.0.1",
+  "author": "Kamil Ogórek",
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
