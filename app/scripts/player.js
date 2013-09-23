@@ -1,19 +1,25 @@
 /* global define, Engine */
 'use strict';
 
-define(['config', 'game', 'scene', 'viewport', 'asteroids'], function (config, game, scene, viewport, asteroids) {
-    var Player = {};
-    // TODO: Add sounds
+define(['config', 'game', 'scene', 'viewport', 'asteroids', 'sounds'], function (config, game, scene, viewport, asteroids, sounds) {
+    var player = {};
     // TODO: Add mouse support
 
-    Player.init = function () {
+    // TODO: Lighter color to particles after destroying ship
+
+    player.init = function () {
         this.bullets = [];
         this.create();
         this.bindEvents();
         this.bindKeys();
     };
 
-    Player.create = function () {
+    player.create = function () {
+        // Restart speed - key persistent bug
+        config.ship.speed.x = 0;
+        config.ship.speed.y = 0;
+        game.trigger('stopShooting');
+
         new Engine.Geometry.Rectangle({
             parent: scene,
             name: 'ship',
@@ -27,7 +33,7 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids'], function (config, g
         new Engine.Timer({
             autoplay: true,
             loop: true,
-            duration: 200,
+            duration: 150,
             iterations: 10,
             on: {
                 play: function () {
@@ -49,14 +55,21 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids'], function (config, g
         });
     };
 
-    Player.bulletAsteroidCollision = function (bullet, asteroid) {
+    player.checkBulletOverflow = function (bullet) {
+        if (bullet.top < -config.viewport.height / 2) {
+            this.bullets.remove(bullet);
+            bullet.destroy();
+        }
+    };
+
+    player.bulletAsteroidCollision = function (bullet, asteroid) {
         if (Engine.Box.overlap(asteroid.left, asteroid.top, asteroid.width, asteroid.height,
-            bullet.left, bullet.top, bullet.width, bullet.height)){
+            bullet.left, bullet.top, bullet.width, bullet.height)) {
 
             this.bullets.remove(bullet);
             bullet.destroy();
 
-            asteroids.remove(asteroid);
+            asteroids.instances.remove(asteroid);
             asteroid.destroy();
 
             game.trigger('asteroidDestroyed', asteroid);
@@ -66,7 +79,7 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids'], function (config, g
         }
     };
 
-    Player.playerAsteroidCollision = function (asteroid) {
+    player.playerAsteroidCollision = function (asteroid) {
         if (scene.ship === undefined) return;
         if (scene.ship.invincible) return;
 
@@ -79,11 +92,11 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids'], function (config, g
                 y: scene.ship.top
             };
 
-            game.trigger('shipDestroyed');
+            game.trigger('shipDestroyed', scene.ship);
         }
     };
 
-    Player.bindEvents = function () {
+    player.bindEvents = function () {
         var _this = this;
 
         game.on('step', function () {
@@ -112,34 +125,94 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids'], function (config, g
             _this.bullets.some(function (bullet) {
                 bullet.setPosition(bullet.left, bullet.top - config.bullet.acc);
 
-                asteroids.some(function (asteroid) {
+                asteroids.instances.some(function (asteroid) {
                     _this.bulletAsteroidCollision(bullet, asteroid);
                 });
+
+                _this.checkBulletOverflow(bullet);
             });
         });
 
         game.on('step', function () {
-            asteroids.some(function (asteroid) {
+            asteroids.instances.some(function (asteroid) {
                 _this.playerAsteroidCollision(asteroid);
             });
         });
 
-        game.on('shoot', function () {
-            var bullet = new Engine.Geometry.Rectangle({
+        game.on('startShooting', function () {
+            // Ignore first delay and shoot immediatelly
+            _this.generateBullet();
+
+            _this.shootingInterval = setInterval(function () {
+                _this.generateBullet();
+            }, 200);
+        });
+
+        game.on('stopShooting', function () {
+            clearInterval(_this.shootingInterval);
+        });
+
+        game.on('shipDestroyed', function (ship) {
+            config.ship.lives -= 1;
+            ship.destroy();
+
+            new Engine.Particles({
                 parent: scene,
-                fill: config.bullet.asset,
-                left: scene.ship.left + scene.ship.width / 2 - 4,
-                top: scene.ship.top - 35,
-                width: config.bullet.width,
-                height: config.bullet.height
+                iterations: 10,
+                emitDelay: 0,
+                width: ship.width,
+                height: ship.height,
+                left: ship.left,
+                top: ship.top,
+                amount: 20,
+                fill: 'rgb(168, 23, 23) 3px 3px',
+                originX: ship.width / 2,
+                originY: ship.height / 2,
+                lifetime: 5000,
+                on: {
+                    beforecreateparticle: function() {
+                        this.dx = Math.random() * ship.width * 1000;
+                        this.dy = Math.random() * ship.height * 1000;
+                    }
+                }
             });
 
-            _this.bullets.push(bullet);
-            scene.appendChild(bullet);
+            if (config.ship.lives) {
+                setTimeout(function () {
+                    game.trigger('respawnPlayer');
+                }, 2000);
+            } else {
+                game.trigger('gameover');
+            }
+        });
+
+        game.on('respawnPlayer', function () {
+            _this.create();
         });
     };
 
-    Player.bindKeys = function () {
+    player.generateBullet = function () {
+        if (scene.ship === undefined) return;
+
+        var bullet = new Engine.Geometry.Rectangle({
+            parent: scene,
+            fill: config.bullet.asset,
+            left: scene.ship.left + scene.ship.width / 2 - 4,
+            top: scene.ship.top - 35,
+            width: config.bullet.width,
+            height: config.bullet.height
+        });
+
+        this.bullets.push(bullet);
+        scene.appendChild(bullet);
+
+        sounds.shootBullet.stop();
+        sounds.shootBullet.play();
+    };
+
+    // TODO: Debug slowness after some time
+
+    player.bindKeys = function () {
         Engine.Input.on('keydown', function (e) {
             if (scene.ship === undefined) return;
 
@@ -159,7 +232,7 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids'], function (config, g
                 config.ship.speed.y += config.ship.speed.acc;
                 break;
             case 'SPACE':
-                game.trigger('shoot');
+                game.trigger('startShooting');
                 break;
             }
         });
@@ -182,11 +255,14 @@ define(['config', 'game', 'scene', 'viewport', 'asteroids'], function (config, g
             case 'ARROW_DOWN':
                 config.ship.speed.y -= config.ship.speed.acc;
                 break;
+            case 'SPACE':
+                game.trigger('stopShooting');
+                break;
             }
         });
     };
 
-    return Player;
+    return player;
 
     // TODO: Remove bower deps from, add it back to ignore and add proper build
 });

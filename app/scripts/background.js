@@ -1,15 +1,17 @@
 /* global define, Engine */
 'use strict';
 
-define(['game', 'scene', 'viewport', 'camera'], function (game, scene, viewport, camera) {
-    var Background = {};
+define(['game', 'scene', 'viewport'], function (game, scene, viewport) {
+    var background = {};
 
-    Background.sparkles = [];
+    background.sparkles = [];
 
-    Background.sparklesNumber = 500;
+    background.sparklesNumber = 500;
 
-    Background.init = function () {
+    background.init = function () {
         var _this = this;
+
+        this.generateSparkles();
 
         game.on('step', function () {
             for (var i = 0; i < 5; i++) {
@@ -18,7 +20,7 @@ define(['game', 'scene', 'viewport', 'camera'], function (game, scene, viewport,
         });
     };
 
-    Background.generateSparkle = function () {
+    background.generateSparkle = function () {
         var sparkle = new Engine.Geometry.Rectangle({
             width: 2,
             height: 2,
@@ -32,13 +34,11 @@ define(['game', 'scene', 'viewport', 'camera'], function (game, scene, viewport,
         scene.appendChild(sparkle);
     };
 
-    Background.generateSparkles = function () {
+    background.generateSparkles = function () {
         for (var i = 0; i < this.sparklesNumber; i++) {
             this.generateSparkle();
         }
     };
 
-    Background.generateSparkles();
-
-    return Background;
+    return background;
 });

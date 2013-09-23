@@ -1,7 +1,7 @@
 /* global define, Engine */
 'use strict';
 
-define(['config', 'game', 'scene', 'player'], function (config, game, scene, player) {
+define(['config', 'game', 'scene'], function (config, game, scene) {
     var ui = {};
 
     ui.init = function () {
@@ -15,14 +15,11 @@ define(['config', 'game', 'scene', 'player'], function (config, game, scene, pla
         var _this = this;
 
         game.on('shipDestroyed', function () {
-            --config.ship.lives;
-            scene.ship.destroy();
-
             if (config.ship.lives) {
-                player.create();
                 _this.drawLives();
             } else {
-                game.trigger('gameover');
+                // Remove last life from UI
+                _this.lives.pop().destroy();
             }
         });
 
@@ -49,7 +46,7 @@ define(['config', 'game', 'scene', 'player'], function (config, game, scene, pla
     };
 
     ui.updateScore = function (points) {
-        var counter = document.querySelector('#score');
+        var counter = document.querySelector('.score');
 
         this.score += points;
 

@@ -37,6 +37,14 @@ define(function () {
         acc: 20
     };
 
+    config.asteroid = {
+        width: 44,
+        height: 42,
+        asset: 'image(images/meteorSmall.png)',
+        top: -config.viewport.height / 2 - 20,
+        spacing: 15
+    };
+
     config.ui = {
         life: {
             width: 35,
