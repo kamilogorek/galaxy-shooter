@@ -1,6 +1,10 @@
 'use strict';
 
 require(['game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function (game, background, player, ui, asteroids, sounds) {
+    // TODO: Add README.md and fix grunt build
+
+    // TODO: Allow to choose ship
+
     var startScreen = document.querySelector('.start-screen');
     var uiScreen = document.querySelector('.ui');
     var endScreen = document.querySelector('.end-screen');

@@ -14,8 +14,8 @@ define(function () {
         height: 75,
         assets: {
             default: 'image(images/player.png)',
-            left: 'image(images/playerLeft.png)',
-            right: 'image(images/playerRight.png)'
+            left: 'image(images/player-left.png)',
+            right: 'image(images/player-right.png)'
         },
         lastPosition: {
             x: -38,
@@ -33,14 +33,14 @@ define(function () {
     config.bullet = {
         width: 9,
         height: 33,
-        asset: 'image(images/laserRed.png)',
+        asset: 'image(images/laser-red.png)',
         acc: 20
     };
 
     config.asteroid = {
         width: 44,
         height: 42,
-        asset: 'image(images/meteorSmall.png)',
+        asset: 'image(images/meteor-small.png)',
         top: -config.viewport.height / 2 - 20,
         spacing: 15
     };
