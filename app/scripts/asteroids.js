@@ -112,7 +112,7 @@ define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game
         game.on('asteroidOverflow', function (asteroid) {
             asteroid.destroy();
         });
-    }
+    };
 
     // TODO: Add super powers (tripple shot, fast shot, bomb)
 

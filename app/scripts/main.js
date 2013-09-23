@@ -1,11 +1,5 @@
 'use strict';
 
-require.config({
-    paths: {
-        lodash: 'bower_components/lodash/lodash'
-    }
-});
-
 require(['game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function (game, background, player, ui, asteroids, sounds) {
     var startScreen = document.querySelector('.start-screen');
     var uiScreen = document.querySelector('.ui');
