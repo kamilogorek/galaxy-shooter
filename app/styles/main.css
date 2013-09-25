@@ -24,6 +24,7 @@ body {
 
 .ui,
 .start-screen,
+.ship-screen,
 .end-screen {
     position: absolute;
     top: 0;
@@ -69,6 +70,50 @@ body {
 .disclaimer {
     font-size: 11px;
     line-height: 1.6;
+}
+
+.ship-screen {
+    z-index: 2;
+    text-align: center;
+    font-size: 32px;
+    display: none;
+}
+
+.ship-screen .game-title {
+    margin-bottom: 2em;
+}
+
+.ship-screen h3 {
+    padding-left: 10px;
+}
+
+.ships {
+    height: 10em;
+}
+
+.ship {
+    display: inline-block;
+    text-indent: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 1em;
+}
+
+.ship:hover {
+    opacity: 0.8;
+}
+
+.ship#red {
+    width: 99px;
+    height: 75px;
+    background: url(../images/player-red.png) 0 0 no-repeat;
+}
+
+.ship#green {
+    width: 98px;
+    height: 50px;
+    background: url(../images/player-green.png) 0 0 no-repeat;
+    vertical-align: -18px;
 }
 
 .end-screen {

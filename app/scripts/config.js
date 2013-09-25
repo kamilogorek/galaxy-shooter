@@ -10,12 +10,25 @@ define(function () {
     };
 
     config.ship = {
-        width: 99,
-        height: 75,
-        assets: {
-            default: 'image(images/player.png)',
-            left: 'image(images/player-left.png)',
-            right: 'image(images/player-right.png)'
+        red: {
+            width: 99,
+            height: 75,
+            assets: {
+                default: 'image(images/player-red.png)',
+                left: 'image(images/player-red-left.png)',
+                right: 'image(images/player-red-right.png)'
+            },
+            particlesColor: 'rgb(185, 75, 75) 3px 3px'
+        },
+        green: {
+            width: 98,
+            height: 50,
+            assets: {
+                default: 'image(images/player-green.png)',
+                left: 'image(images/player-green-left.png)',
+                right: 'image(images/player-green-right.png)'
+            },
+            particlesColor: 'rgb(160, 200, 100) 3px 3px'
         },
         lastPosition: {
             x: -38,
@@ -33,7 +46,10 @@ define(function () {
     config.bullet = {
         width: 9,
         height: 33,
-        asset: 'image(images/laser-red.png)',
+        asset: {
+            red: 'image(images/laser-red.png)',
+            green: 'image(images/laser-green.png)'
+        },
         acc: 20
     };
 
@@ -49,7 +65,10 @@ define(function () {
         life: {
             width: 35,
             height: 27,
-            asset: 'image(images/life.png)',
+            asset: {
+                red: 'image(images/life-red.png)',
+                green: 'image(images/life-green.png)'
+            },
             y: 20,
             x: 20
         }

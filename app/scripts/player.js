@@ -7,7 +7,9 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
 
     player.bullets = [];
 
-    player.init = function () {
+    player.init = function (shipColor) {
+        this.shipColor = shipColor;
+
         // Restart positions
         this.lastPosition = {
             x: config.ship.lastPosition.x,
@@ -36,11 +38,11 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
         new Engine.Geometry.Rectangle({
             parent: scene,
             name: 'ship',
-            width: config.ship.width,
-            height: config.ship.height,
+            width: config.ship[this.shipColor].width,
+            height: config.ship[this.shipColor].height,
             left: this.lastPosition.x,
             top: this.lastPosition.y,
-            fill: config.ship.assets.default
+            fill: config.ship[this.shipColor].assets.default
         });
 
         new Engine.Timer({
@@ -182,7 +184,7 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
                 left: ship.left,
                 top: ship.top,
                 amount: 20,
-                fill: 'rgb(185, 75, 75) 3px 3px',
+                fill: config.ship[_this.shipColor].particlesColor,
                 originX: ship.width / 2,
                 originY: ship.height / 2,
                 lifetime: 5000,
@@ -209,11 +211,13 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
     };
 
     player.generateBullet = function () {
+        var _this = this;
+
         if (scene.ship === undefined) { return; }
 
         var bullet = new Engine.Geometry.Rectangle({
             parent: scene,
-            fill: config.bullet.asset,
+            fill: config.bullet.asset[_this.shipColor],
             left: scene.ship.left + scene.ship.width / 2 - 4,
             top: scene.ship.top - 35,
             width: config.bullet.width,
@@ -230,6 +234,8 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
     // TODO: Debug slowness after some time
 
     player.bindKeys = function () {
+        var _this = this;
+
         this.keysBound = true;
 
         Engine.Input.on('keydown', function (e) {
@@ -238,11 +244,11 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
             switch (e.key) {
             case 'ARROW_LEFT':
                 config.ship.speed.x -= config.ship.speed.acc;
-                scene.ship.setImage(config.ship.assets.left);
+                scene.ship.setImage(config.ship[_this.shipColor].assets.left);
                 break;
             case 'ARROW_RIGHT':
                 config.ship.speed.x += config.ship.speed.acc;
-                scene.ship.setImage(config.ship.assets.right);
+                scene.ship.setImage(config.ship[_this.shipColor].assets.right);
                 break;
             case 'ARROW_UP':
                 config.ship.speed.y -= config.ship.speed.acc;
@@ -262,11 +268,11 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
             switch (e.key) {
             case 'ARROW_LEFT':
                 config.ship.speed.x += config.ship.speed.acc;
-                scene.ship.setImage(config.ship.assets.default);
+                scene.ship.setImage(config.ship[_this.shipColor].assets.default);
                 break;
             case 'ARROW_RIGHT':
                 config.ship.speed.x -= config.ship.speed.acc;
-                scene.ship.setImage(config.ship.assets.default);
+                scene.ship.setImage(config.ship[_this.shipColor].assets.default);
                 break;
             case 'ARROW_UP':
                 config.ship.speed.y += config.ship.speed.acc;

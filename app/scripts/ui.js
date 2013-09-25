@@ -4,7 +4,8 @@
 define(['config', 'game', 'scene'], function (config, game, scene) {
     var ui = {};
 
-    ui.init = function () {
+    ui.init = function (shipColor) {
+        this.shipColor = shipColor;
         this.livesIcons = [];
         this.livesLeft = config.ship.lives;
         this.score = 0;
@@ -36,6 +37,8 @@ define(['config', 'game', 'scene'], function (config, game, scene) {
     };
 
     ui.drawLives = function () {
+        var _this = this;
+
         while (this.livesIcons.length) {
             this.livesIcons.pop().destroy();
         }
@@ -47,7 +50,7 @@ define(['config', 'game', 'scene'], function (config, game, scene) {
                 height: config.ui.life.height,
                 left: -config.viewport.width / 2 + (config.ui.life.x + (i * (config.ui.life.width + 10))),
                 top: -config.viewport.height / 2 +config.ui.life.y,
-                fill: config.ui.life.asset
+                fill: config.ui.life.asset[_this.shipColor]
             }));
         }
     };
