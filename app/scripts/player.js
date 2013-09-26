@@ -1,9 +1,11 @@
-/* global define, Engine */
+/* global define, Engine, log */
 'use strict';
 
 define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], function (config, game, scene, viewport, ui, asteroids, sounds) {
     var player = {};
-    // TODO: Add mouse support
+    // TODO Debug slowness and key hanging
+
+    // TODO: put debugs wherever I should
 
     player.bullets = [];
 
@@ -89,8 +91,10 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
 
             game.trigger('asteroidDestroyed', asteroid);
 
-            // TODO: Add score depending on speed? size?
-            game.trigger('updateScore', 200);
+            // TODO: Move as much as possible to config
+            var points = parseInt(config.asteroid[asteroid.size].points * asteroid.acc, 10);
+
+            game.trigger('updateScore', points);
         }
     };
 
@@ -100,7 +104,6 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
 
         if (Engine.Box.overlap(asteroid.left, asteroid.top, asteroid.width, asteroid.height,
             scene.ship.left, scene.ship.top, scene.ship.width, scene.ship.height)){
-            // TODO: Add particles on game over
 
             this.lastPosition = {
                 x: scene.ship.left,
@@ -229,9 +232,9 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
 
         sounds.shootBullet.stop();
         sounds.shootBullet.play();
-    };
 
-    // TODO: Debug slowness after some time
+        log('Bullets:', this.bullets);
+    };
 
     player.bindKeys = function () {
         var _this = this;
@@ -288,6 +291,4 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
     };
 
     return player;
-
-    // TODO: Remove bower deps from, add it back to ignore and add proper build
 });

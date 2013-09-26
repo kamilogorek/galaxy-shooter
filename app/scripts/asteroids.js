@@ -1,4 +1,4 @@
-/* global define, Engine */
+/* global define, Engine, log */
 'use strict';
 
 define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game, scene, viewport, sounds) {
@@ -11,43 +11,69 @@ define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game
             this.instances.pop().destroy();
         }
 
-        // Random number between 3 and 5
-        this.generateAsteroids(Math.floor(Math.random() * (5 - 3 + 1)) + 3);
+        this.minNumber = config.asteroid.minNumber;
+        this.maxNumber = config.asteroid.maxNumber;
+
+        // Random number between min and max
+        this.generateAsteroids(Math.floor(Math.random() * (this.maxNumber - this.minNumber + 1)) + this.minNumber);
 
         if (!this.eventsBound) {
             this.bindEvents();
         }
     };
 
-    asteroids.generateAsteroids = function (asteroidsNumber) {
-        for (var i = 0; i < asteroidsNumber; i++) {
-            // TODO Random asteroids size
-            // TODO Create small asteroids from a big one
-            // TODO Spin asteroids
+    asteroids.generateAsteroids = function (asteroidsNumber, replicate) {
+        // TODO Spin asteroids
 
-            var leftPos = Math.random() * config.viewport.width - config.viewport.width / 2 + config.asteroid.spacing;
+        for (var i = 0; i < asteroidsNumber; i++) {
+            var size;
+            var leftPos;
+            var topPos;
+            var acc;
+
+            if (replicate) {
+                size = 'small';
+                // center of the old asteroid
+                leftPos = replicate.left + replicate.width / 2;
+                // spread replicated asteroids evenly from left to right
+                leftPos += (-Math.round(asteroidsNumber / 2) + i + 1) * (config.asteroid[size].width);
+                topPos = replicate.top + replicate.height;
+                acc = replicate.acc + Math.random() * 3 + 1;
+                // TODO use profiler
+            } else {
+                // Chance of generating big asteroid
+                size = Math.random() < config.asteroid.chance ? 'big' : 'small';
+                leftPos = Math.random() * config.viewport.width - config.viewport.width / 2 + config.asteroid.spacing;
+                topPos = config.asteroid.top;
+                acc = Math.random() * (5 - 2 + 1) + 2;
+            }
 
             // if it overflows on the right side, add difference + spacing
-            if (leftPos + config.asteroid.width + config.asteroid.spacing > viewport.width / 2) {
-                var diff = leftPos + config.asteroid.width - viewport.width / 2;
+            if (leftPos + config.asteroid[size].width + config.asteroid.spacing > viewport.width / 2) {
+                var diff = leftPos + config.asteroid[size].width - viewport.width / 2;
                 leftPos = leftPos - diff - config.asteroid.spacing;
             }
 
             var asteroid = new Engine.Geometry.Rectangle({
                 parent: scene,
-                fill: config.asteroid.asset,
+                fill: config.asteroid[size].asset,
                 left: leftPos,
-                top: config.asteroid.top,
-                width: config.asteroid.width,
-                height: config.asteroid.height
+                top: topPos,
+                width: config.asteroid[size].width,
+                height: config.asteroid[size].height
             });
 
-            // Random number between 2 and 5
-            asteroid.acc = Math.floor(Math.random() * (5 - 2 + 1)) + 2;
+            // Random float number between 2 and 5
+            asteroid.acc = acc;
+            asteroid.size = size;
 
             this.instances.push(asteroid);
         }
+
+        log('Asteroids:', this.instances);
     };
+
+    // TODO: Add scoreboard
 
     asteroids.checkOverflow = function (asteroid) {
         if (asteroid.top > config.viewport.height / 2) {
@@ -58,8 +84,36 @@ define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game
 
     asteroids.bindEvents = function () {
         var _this = this;
+        var generateCounter = 0;
+        var difficultyCounter = 0;
 
         this.eventsBound = true;
+
+        game.on('loop', function () {
+            (function generateAsteroidsLoop () {
+                // Generate only every config.asteroid.generateDelay loop
+                if (++generateCounter !== config.asteroid.generateDelay) { return; }
+                // Reset step counter
+                generateCounter = 0;
+
+                // Random number between min and max
+                _this.generateAsteroids(Math.floor(Math.random() * (_this.maxNumber - _this.minNumber + 1)) + _this.minNumber);
+            })();
+
+            (function generateAsteroidsLoop () {
+                if (++difficultyCounter !== config.asteroid.changeDifficultyDelay) { return; }
+                // Reset step counter
+                difficultyCounter = 0;
+
+                if (Math.random() > 0.5) {
+                    _this.minNumber++;
+                    log('Increased min number');
+                } else {
+                    _this.maxNumber++;
+                    log('Increased max number');
+                }
+            })();
+        });
 
         game.on('step', function () {
             _this.instances.some(function (asteroid) {
@@ -68,20 +122,6 @@ define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game
                 _this.checkOverflow(asteroid);
             });
         });
-
-        var step = 0;
-
-        game.on('loop', function () {
-            ++step;
-            // TODO: Check progress variable in docs = FIXIT
-            if (step === 3) {
-                // Random number between 3 and 5
-                _this.generateAsteroids(Math.floor(Math.random() * (5 - 3 + 1)) + 3);
-                step = 0;
-            }
-        });
-
-        // TODO: Increase min and max on timeInterval
 
         game.on('asteroidDestroyed', function (asteroid) {
             sounds.asteroidDestroyed.stop();
@@ -107,6 +147,10 @@ define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game
                     }
                 }
             });
+
+            if (asteroid.size === 'big') {
+                _this.generateAsteroids(config.asteroid.replicateNumber, asteroid);
+            }
         });
 
         game.on('asteroidOverflow', function (asteroid) {

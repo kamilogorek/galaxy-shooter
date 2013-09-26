@@ -1,7 +1,13 @@
+/* global Engine */
 'use strict';
 
 require(['game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function (game, background, player, ui, asteroids, sounds) {
-    // TODO: Add README.md and fix grunt build
+    // Simple console.log wrapper to enable debugMode
+    window.debugMode = true;
+    window.log = function () {
+        if (!window.debugMode) { return; }
+        window.console.log.apply(console, arguments);
+    };
 
     var startScreen = document.querySelector('.start-screen');
     var uiScreen = document.querySelector('.ui');
@@ -11,6 +17,9 @@ require(['game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function 
     var startButton = document.querySelector('.start-game');
     var restartButton = document.querySelector('.restart-game');
     var endScore = document.querySelector('.end-score');
+    var pauseScreen = document.querySelector('.pause-screen');
+
+    // TODO: Fix grunt build
 
     background.init();
 
@@ -45,5 +54,27 @@ require(['game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function 
         endScore.innerText = ui.score;
         endScreen.style.display = 'block';
         uiScreen.style.display = 'none';
+    });
+
+    game.on('pause', function () {
+        pauseScreen.style.display = 'block';
+    });
+
+    game.on('unpause', function () {
+        pauseScreen.style.display = 'none';
+    });
+
+    Engine.Input.on('keyup', function (e) {
+        if (e.key === 'P') {
+            if (!game.paused) {
+                game.stop();
+                game.paused = true;
+                game.trigger('pause');
+            } else {
+                game.play();
+                game.paused = false;
+                game.trigger('unpause');
+            }
+        }
     });
 });

@@ -4,6 +4,8 @@
 define(function () {
     var config = {};
 
+    // TODO: Comment code and config
+
     config.viewport = {
         width: 600,
         height: 800
@@ -54,11 +56,30 @@ define(function () {
     };
 
     config.asteroid = {
-        width: 44,
-        height: 42,
-        asset: 'image(images/meteor-small.png)',
+        small: {
+            width: 44,
+            height: 42,
+            asset: 'image(images/meteor-small.png)',
+            points: 100
+        },
+        big: {
+            width: 136,
+            height: 111,
+            asset: 'image(images/meteor-big.png)',
+            points: 200
+        },
         top: -config.viewport.height / 2 - 20,
-        spacing: 15
+        // Screen spacing from left and right side
+        spacing: 15,
+        minNumber: 3,
+        maxNumber: 5,
+        // 20% chance of generating big asteroid
+        chance: 0.2,
+        replicateNumber: 5,
+        // Generate new asteroids every 3 seconds
+        generateDelay: 3,
+        // Increase difficulty every 10 seconds
+        changeDifficultyDelay: 10
     };
 
     config.ui = {
