@@ -57,7 +57,7 @@ body {
 }
 
 .start-screen .game-title {
-    margin-bottom: 3em;
+    margin-bottom: 2.7em;
 }
 
 .start-game {
@@ -67,7 +67,7 @@ body {
 .controls {
     list-style-type: none;
     font-size: 16px;
-    margin: 0 0 6.2em 0;
+    margin: 0 0 5.4em 0;
     padding: 0;
 }
 
@@ -100,32 +100,31 @@ body {
 }
 
 .ships {
-    height: 10em;
+    height: 10.05em;
 }
 
 .ship {
     display: inline-block;
     text-indent: 100%;
+    width: 99px;
+    height: 75px;
     overflow: hidden;
     white-space: nowrap;
     margin: 1em;
+    opacity: 0.7;
 }
 
-.ship:hover {
-    opacity: 0.8;
+.ship:hover,
+.ship.active {
+    opacity: 1;
 }
 
 .ship#red {
-    width: 99px;
-    height: 75px;
-    background: url(../images/player-red.png) 0 0 no-repeat;
+    background: url(../images/player-red.png) center center no-repeat;
 }
 
 .ship#green {
-    width: 98px;
-    height: 50px;
-    background: url(../images/player-green.png) 0 0 no-repeat;
-    vertical-align: -18px;
+    background: url(../images/player-green.png) center center no-repeat;
 }
 
 .end-screen {
@@ -136,20 +135,41 @@ body {
 }
 
 .end-screen .game-title {
-    margin-bottom: 1.75em;
+    margin-bottom: 1.25em;
 }
 
 .end-screen h3 {
+    font-size: 32px;
+    line-height: 1.5;
+    text-transform: uppercase;
+}
+
+.scores {
+    display: block;
+    font-size: 24px;
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 1em 0;
+    height: 8em;
+}
+
+.scores li {
     line-height: 1.5;
 }
 
-.end-score {
-    display: block;
-    font-size: 48px;
+.scores span {
+    display: inline-block;
+}
+
+.scores .current span {
+    -webkit-animation: blink .5s linear infinite;
+    -moz-animation: blink .5s linear infinite;
+    -o-animation: blink .5s linear infinite;
+    animation: blink .5s linear infinite;
 }
 
 .restart-game {
-    margin-bottom: 7.05em;
+    margin-bottom: 2.95em;
 }
 
 .button {

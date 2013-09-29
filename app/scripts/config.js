@@ -8,7 +8,15 @@ define(function () {
 
     config.viewport = {
         width: 600,
-        height: 800
+        height: 800,
+        background: '#000'
+    };
+
+    config.background = {
+        width: 2,
+        height: 2,
+        color: '#fff',
+        count: 500
     };
 
     config.ship = {
@@ -36,11 +44,7 @@ define(function () {
             x: -38,
             y: config.viewport.height / 2 - 90
         },
-        speed: {
-            x: 0,
-            y: 0,
-            acc: 10
-        },
+        acc: 10,
         bulletAcc: 20,
         lives: 3
     };
@@ -60,22 +64,24 @@ define(function () {
             width: 44,
             height: 42,
             asset: 'image(images/meteor-small.png)',
-            points: 100
+            points: 20
         },
         big: {
             width: 136,
             height: 111,
             asset: 'image(images/meteor-big.png)',
-            points: 200
+            points: 50
         },
         top: -config.viewport.height / 2 - 20,
         // Screen spacing from left and right side
         spacing: 15,
         minNumber: 3,
         maxNumber: 5,
+        minAcc: 3,
+        maxAcc: 5,
         // 20% chance of generating big asteroid
         chance: 0.2,
-        replicateNumber: 5,
+        maxReplicateNumber: 5,
         // Generate new asteroids every 3 seconds
         generateDelay: 3,
         // Increase difficulty every 10 seconds

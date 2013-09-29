@@ -1,41 +1,38 @@
 /* global define, Engine */
 'use strict';
 
-define(['game', 'scene', 'viewport'], function (game, scene, viewport) {
+define(['game', 'config', 'scene'], function (game, config, scene) {
     var background = {};
-
-    background.sparkles = [];
-
-    background.sparklesNumber = 500;
 
     background.init = function () {
         var _this = this;
 
+        this.sparkles = [];
         this.generateSparkles();
 
         game.on('step', function () {
             for (var i = 0; i < 5; i++) {
-                _this.sparkles[Math.floor(Math.random() * _this.sparklesNumber)].setOpacity(Math.random());
+                _this.sparkles[Math.floor(Math.random() * config.background.count)].setOpacity(Math.random());
             }
         });
     };
 
     background.generateSparkle = function () {
-        var sparkle = new Engine.Geometry.Rectangle({
-            width: 2,
-            height: 2,
-            left: Math.round(Math.random() *  viewport.width) - viewport.width / 2,
-            top: Math.round(Math.random() * viewport.height) - viewport.height / 2,
-            fill: 'white',
-            opacity: Math.random()
-        });
-
-        this.sparkles.push(sparkle);
-        scene.appendChild(sparkle);
+        this.sparkles.push(
+            new Engine.Geometry.Rectangle({
+                parent: scene,
+                width: config.background.width,
+                height: config.background.height,
+                left: Math.round(Math.random() *  config.viewport.width) - config.viewport.width / 2,
+                top: Math.round(Math.random() * config.viewport.height) - config.viewport.height / 2,
+                fill: config.background.color,
+                opacity: Math.random()
+            })
+        );
     };
 
     background.generateSparkles = function () {
-        for (var i = 0; i < this.sparklesNumber; i++) {
+        for (var i = 0; i < config.background.count; i++) {
             this.generateSparkle();
         }
     };

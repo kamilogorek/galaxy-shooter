@@ -34,6 +34,10 @@ define(['config', 'game', 'scene'], function (config, game, scene) {
         game.on('updateScore', function (points) {
             _this.updateScore(points);
         });
+
+        game.on('gameover', function () {
+            _this.updateScoreboard();
+        });
     };
 
     ui.drawLives = function () {
@@ -58,9 +62,37 @@ define(['config', 'game', 'scene'], function (config, game, scene) {
     ui.updateScore = function (points) {
         var counter = document.querySelector('.score');
 
-        this.score += points;
+        counter.innerText = this.score += points;
+    };
 
-        counter.innerText = this.score;
+    // Simple high-scores list based on localStorage
+    ui.updateScoreboard = function () {
+        if (!window.localStorage) { return; }
+
+        var key = 'scores';
+        var currentScore = this.score;
+        var scores = localStorage.getItem(key) ? localStorage.getItem(key).split(',').map(function (n) { return parseInt(n, 10); }) : [];
+
+        scores.push(currentScore);
+
+        scores.sort(function (a, b) {
+            return b - a;
+        });
+
+        scores = scores.splice(0, 5);
+
+        localStorage.setItem(key, scores);
+
+        var scoresList = document.querySelector('.scores');
+
+        scoresList.innerHTML = '';
+        scores.forEach(function (score) {
+            if (score === currentScore) {
+                scoresList.innerHTML += '<li class="current"><span>' + score + '</span></li>';
+            } else {
+                scoresList.innerHTML += '<li><span>' + score + '</span></li>';
+            }
+        });
     };
 
     return ui;

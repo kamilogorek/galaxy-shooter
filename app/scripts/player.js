@@ -1,11 +1,9 @@
-/* global define, Engine, log */
+/* global define, Engine */
 'use strict';
 
 define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], function (config, game, scene, viewport, ui, asteroids, sounds) {
     var player = {};
-    // TODO Debug slowness and key hanging
-
-    // TODO: put debugs wherever I should
+    // TODO: Debug performance issue
 
     player.bullets = [];
 
@@ -20,21 +18,19 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
 
         this.create();
 
-        if (!this.eventsBound) {
-            this.bindEvents();
-        }
-
-        if (!this.keysBound) {
-            this.bindKeys();
-        }
+        if (!this.eventsBound) { this.bindEvents(); }
+        if (!this.keysBound) { this.bindKeys(); }
     };
 
     player.create = function () {
         sounds.shipCreated.play();
 
-        // Restart speed - key persistent bug
-        config.ship.speed.x = 0;
-        config.ship.speed.y = 0;
+        // Restart speed - key persistent issue
+        this.speed = {
+            x: 0,
+            y: 0
+        };
+
         game.trigger('stopShooting');
 
         new Engine.Geometry.Rectangle({
@@ -92,7 +88,7 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
             game.trigger('asteroidDestroyed', asteroid);
 
             // TODO: Move as much as possible to config
-            var points = parseInt(config.asteroid[asteroid.size].points * asteroid.acc, 10);
+            var points = parseInt(config.asteroid[asteroid.size].points * asteroid.acc / 2, 10);
 
             game.trigger('updateScore', points);
         }
@@ -127,7 +123,6 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
             var topBorder = scene.ship.top + viewport.height / 2 < 0;
             var bottomBorder = scene.ship.top + scene.ship.height + viewport.height/2 > viewport.height;
 
-            // TODO: Find better solution
             if (leftBorder) {
                 scene.ship.setPosition(++scene.ship.left, scene.ship.top);
             } else if (rightBorder) {
@@ -137,7 +132,7 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
             } else if (bottomBorder) {
                 scene.ship.setPosition(scene.ship.left, --scene.ship.top);
             } else {
-                scene.ship.setPosition(scene.ship.left + config.ship.speed.x, scene.ship.top + config.ship.speed.y);
+                scene.ship.setPosition(scene.ship.left + _this.speed.x, scene.ship.top + _this.speed.y);
             }
         });
 
@@ -178,26 +173,28 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
             ui.livesLeft -= 1;
             ship.destroy();
 
-            new Engine.Particles({
-                parent: scene,
-                iterations: 10,
-                emitDelay: 0,
-                width: ship.width,
-                height: ship.height,
-                left: ship.left,
-                top: ship.top,
-                amount: 20,
-                fill: config.ship[_this.shipColor].particlesColor,
-                originX: ship.width / 2,
-                originY: ship.height / 2,
-                lifetime: 5000,
-                on: {
-                    beforecreateparticle: function() {
-                        this.dx = Math.random() * ship.width * 1000;
-                        this.dy = Math.random() * ship.height * 1000;
-                    }
-                }
-            });
+            // FIX: Particles are causing really huge performance issues
+
+            // new Engine.Particles({
+            //     parent: scene,
+            //     iterations: 10,
+            //     emitDelay: 0,
+            //     width: ship.width,
+            //     height: ship.height,
+            //     left: ship.left,
+            //     top: ship.top,
+            //     amount: 20,
+            //     fill: config.ship[_this.shipColor].particlesColor,
+            //     originX: ship.width / 2,
+            //     originY: ship.height / 2,
+            //     lifetime: 5000,
+            //     on: {
+            //         beforecreateparticle: function() {
+            //             this.dx = Math.random() * ship.width * 1000;
+            //             this.dy = Math.random() * ship.height * 1000;
+            //         }
+            //     }
+            // });
 
             if (ui.livesLeft) {
                 setTimeout(function () {
@@ -232,8 +229,6 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
 
         sounds.shootBullet.stop();
         sounds.shootBullet.play();
-
-        log('Bullets:', this.bullets);
     };
 
     player.bindKeys = function () {
@@ -246,18 +241,18 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
 
             switch (e.key) {
             case 'ARROW_LEFT':
-                config.ship.speed.x -= config.ship.speed.acc;
+                _this.speed.x -= config.ship.acc;
                 scene.ship.setImage(config.ship[_this.shipColor].assets.left);
                 break;
             case 'ARROW_RIGHT':
-                config.ship.speed.x += config.ship.speed.acc;
+                _this.speed.x += config.ship.acc;
                 scene.ship.setImage(config.ship[_this.shipColor].assets.right);
                 break;
             case 'ARROW_UP':
-                config.ship.speed.y -= config.ship.speed.acc;
+                _this.speed.y -= config.ship.acc;
                 break;
             case 'ARROW_DOWN':
-                config.ship.speed.y += config.ship.speed.acc;
+                _this.speed.y += config.ship.acc;
                 break;
             case 'SPACE':
                 game.trigger('startShooting');
@@ -270,18 +265,18 @@ define(['config', 'game', 'scene', 'viewport', 'ui', 'asteroids', 'sounds'], fun
 
             switch (e.key) {
             case 'ARROW_LEFT':
-                config.ship.speed.x += config.ship.speed.acc;
+                _this.speed.x += config.ship.acc;
                 scene.ship.setImage(config.ship[_this.shipColor].assets.default);
                 break;
             case 'ARROW_RIGHT':
-                config.ship.speed.x -= config.ship.speed.acc;
+                _this.speed.x -= config.ship.acc;
                 scene.ship.setImage(config.ship[_this.shipColor].assets.default);
                 break;
             case 'ARROW_UP':
-                config.ship.speed.y += config.ship.speed.acc;
+                _this.speed.y += config.ship.acc;
                 break;
             case 'ARROW_DOWN':
-                config.ship.speed.y -= config.ship.speed.acc;
+                _this.speed.y -= config.ship.acc;
                 break;
             case 'SPACE':
                 game.trigger('stopShooting');
