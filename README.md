@@ -1,5 +1,7 @@
 # Galaxy Shooter
 
+__Demo:__ http://kamilogorek.pl/lab/galaxy-shooter/app/
+
 #### Changelog 29.09
 * Temporarily turned off particles effect on asteroids/ship destroy as it caused big performance issues
 * Added scoreboard
