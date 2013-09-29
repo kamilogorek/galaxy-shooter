@@ -1,11 +1,4 @@
-// Generated on 2013-09-17 using generator-webapp 0.4.2
 'use strict';
-
-// # Globbing
-// for performance reasons we're only matching one level down:
-// 'test/spec/{,*/}*.js'
-// use this if you want to recursively match all subfolders:
-// 'test/spec/**/*.js'
 
 module.exports = function (grunt) {
     // load all grunt tasks

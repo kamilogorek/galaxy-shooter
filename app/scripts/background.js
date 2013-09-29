@@ -1,7 +1,7 @@
 /* global define, Engine */
 'use strict';
 
-define(['game', 'config', 'scene'], function (game, config, scene) {
+define(['config', 'game', 'scene'], function (config, game, scene) {
     var background = {};
 
     background.init = function () {
@@ -11,7 +11,7 @@ define(['game', 'config', 'scene'], function (game, config, scene) {
         this.generateSparkles();
 
         game.on('step', function () {
-            for (var i = 0; i < 5; i++) {
+            for (var i = 0; i < config.background.animationCount; i++) {
                 _this.sparkles[Math.floor(Math.random() * config.background.count)].setOpacity(Math.random());
             }
         });

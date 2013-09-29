@@ -1,22 +1,16 @@
 /* global Engine */
 'use strict';
 
-require(['game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function (game, background, player, ui, asteroids, sounds) {
-    // Simple console.log wrapper to enable debugMode
-    window.debugMode = false;
-    window.log = function () {
-        if (!window.debugMode) { return; }
-        window.console.log.apply(console, arguments);
-    };
+/*
+ * TODO:
+ * [ ] - Debug overall performance issue
+ * [ ] - Fix particles performance issue
+ * [ ] - Fix grunt build
+ * [ ] - Fix keys persistence bug that happens from time to time
+ *
+ */
 
-    // Init game without any start screens for faster debugging
-    /*
-    startScreen.style.display = 'none';
-    shipScreen.style.display = 'none';
-    uiScreen.style.display = 'block';
-    initGame('red');
-    */
-
+require(['config', 'game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function (config, game, background, player, ui, asteroids, sounds) {
     var startScreen = document.querySelector('.start-screen');
     var uiScreen = document.querySelector('.ui');
     var shipScreen = document.querySelector('.ship-screen');
@@ -26,40 +20,45 @@ require(['game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function 
     var restartButton = document.querySelector('.restart-game');
     var pauseScreen = document.querySelector('.pause-screen');
 
-    // TODO: Fix grunt build
-
     background.init();
 
     function initGame (color) {
-        sounds.pressButton.play();
+        shipScreen.style.display = 'none';
+        uiScreen.style.display = 'block';
 
+        sounds.pressButton.play();
         player.init(color);
         ui.init(color);
         asteroids.init();
     }
 
-    startButton.addEventListener('click', function () {
+    function showShipsScreen () {
         startScreen.style.display = 'none';
         shipScreen.style.display = 'block';
+        endScreen.style.display = 'none';
+    }
+
+    function showEndScreen () {
+        endScreen.style.display = 'block';
+        uiScreen.style.display = 'none';
+    }
+
+    startButton.addEventListener('click', function () {
+        showShipsScreen();
     });
 
     [].forEach.call(ships, function (ship) {
         ship.addEventListener('click', function () {
-            shipScreen.style.display = 'none';
-            uiScreen.style.display = 'block';
-
             initGame(this.id);
         });
     });
 
     restartButton.addEventListener('click', function () {
-        endScreen.style.display = 'none';
-        shipScreen.style.display = 'block';
+        showShipsScreen();
     });
 
     game.on('gameover', function () {
-        endScreen.style.display = 'block';
-        uiScreen.style.display = 'none';
+        showEndScreen();
     });
 
     game.on('pause', function () {
@@ -71,20 +70,17 @@ require(['game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function 
     });
 
     Engine.Input.on('keyup', function (e) {
-        if (e.key === 'ENTER') {
+        switch (e.key) {
+        case config.keys.enter:
             // Allow to init game only when start/restart or ship choosing screen is visible
             if (window.getComputedStyle(startScreen).getPropertyValue('display') === 'block' ||
                 window.getComputedStyle(endScreen).getPropertyValue('display') === 'block') {
-                startScreen.style.display = 'none';
-                endScreen.style.display = 'none';
-                shipScreen.style.display = 'block';
+                showShipsScreen();
             } else if (window.getComputedStyle(shipScreen).getPropertyValue('display') === 'block') {
-                shipScreen.style.display = 'none';
                 initGame(document.querySelector('.ship.active').id);
             }
-        }
-
-        if (e.key === 'ARROW_LEFT') {
+            break;
+        case config.keys.left:
             // Allow to use arrows only when ship choosing screen is visible
             if (window.getComputedStyle(shipScreen).getPropertyValue('display') === 'none') {
                 return;
@@ -93,9 +89,8 @@ require(['game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function 
             [].forEach.call(ships, function (ship) {
                 ship.classList.toggle('active');
             });
-        }
-
-        if (e.key === 'ARROW_RIGHT') {
+            break;
+        case config.keys.right:
             // Allow to use arrows only when ship choosing screen is visible
             if (window.getComputedStyle(shipScreen).getPropertyValue('display') === 'none') {
                 return;
@@ -104,9 +99,8 @@ require(['game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function 
             [].forEach.call(ships, function (ship) {
                 ship.classList.toggle('active');
             });
-        }
-
-        if (e.key === 'P') {
+            break;
+        case config.keys.pause:
             // Allow to use pause only while game is already started
             if (window.getComputedStyle(startScreen).getPropertyValue('display') === 'block' ||
                 window.getComputedStyle(endScreen).getPropertyValue('display') === 'block' ||
@@ -123,6 +117,19 @@ require(['game', 'background', 'player', 'ui', 'asteroids', 'sounds'], function 
                 game.paused = false;
                 game.trigger('unpause');
             }
+            break;
         }
     });
+
+    // Simple console.log wrapper to enable debugMode
+    window.debugMode = false;
+    window.log = function () {
+        if (!window.debugMode) { return; }
+        window.console.log.apply(console, arguments);
+    };
+
+    // Init game without any start screens for faster debugging
+    if (window.debugMode) {
+        initGame('red');
+    }
 });

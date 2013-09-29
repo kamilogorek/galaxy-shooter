@@ -12,9 +12,7 @@ define(['config', 'game', 'scene'], function (config, game, scene) {
         this.updateScore(0);
         this.drawLives();
 
-        if (!this.eventsBound) {
-            this.bindEvents();
-        }
+        if (!this.eventsBound) { this.bindEvents(); }
     };
 
     ui.bindEvents = function () {
@@ -26,7 +24,7 @@ define(['config', 'game', 'scene'], function (config, game, scene) {
             if (this.livesLeft) {
                 _this.drawLives();
             } else {
-                // Remove last life from UI
+                // Force to remove last life from UI when it was the last one
                 _this.livesIcons.pop().destroy();
             }
         });
@@ -44,25 +42,27 @@ define(['config', 'game', 'scene'], function (config, game, scene) {
         var _this = this;
 
         while (this.livesIcons.length) {
+            // Remove all current icons before rendering new one
             this.livesIcons.pop().destroy();
         }
 
         for (var i = 0; i < this.livesLeft; i++) {
-            this.livesIcons.push(new Engine.Geometry.Rectangle({
-                parent: scene,
-                width: config.ui.life.width,
-                height: config.ui.life.height,
-                left: -config.viewport.width / 2 + (config.ui.life.x + (i * (config.ui.life.width + 10))),
-                top: -config.viewport.height / 2 +config.ui.life.y,
-                fill: config.ui.life.asset[_this.shipColor]
-            }));
+            this.livesIcons.push(
+                new Engine.Geometry.Rectangle({
+                    parent: scene,
+                    width: config.ui.life.width,
+                    height: config.ui.life.height,
+                    left: -config.viewport.width / 2 + (config.ui.life.x + (i * (config.ui.life.width + 10))),
+                    top: -config.viewport.height / 2 +config.ui.life.y,
+                    fill: config.ui.life.asset[_this.shipColor]
+                })
+            );
         }
     };
 
     ui.updateScore = function (points) {
-        var counter = document.querySelector('.score');
-
-        counter.innerText = this.score += points;
+        // Update score counter visible to user
+        document.querySelector('.score').innerText = this.score += points;
     };
 
     // Simple high-scores list based on localStorage

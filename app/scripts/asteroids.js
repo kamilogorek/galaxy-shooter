@@ -13,8 +13,9 @@ define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game
 
         this.minNumber = config.asteroid.minNumber;
         this.maxNumber = config.asteroid.maxNumber;
+        this.minAcc = config.asteroid.minAcc;
+        this.maxAcc = config.asteroid.maxAcc;
 
-        // Random number between min and max
         this.generateAsteroids(Math.floor(Math.random() * (this.maxNumber - this.minNumber + 1)) + this.minNumber);
 
         if (!this.eventsBound) { this.bindEvents(); }
@@ -34,13 +35,13 @@ define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game
                 // spread replicated asteroids evenly from left to right
                 leftPos += (-Math.round(asteroidsNumber / 2) + i + 1) * (config.asteroid[size].width);
                 topPos = replicate.top + replicate.height;
-                acc = replicate.acc + Math.random() * (config.asteroid.maxAcc - config.asteroid.minAcc + 1) + config.asteroid.minAcc;
+                acc = replicate.acc + Math.random() * (this.maxAcc - this.minAcc + 1) + this.minAcc;
             } else {
                 // Chance of generating big asteroid
                 size = Math.random() < config.asteroid.chance ? 'big' : 'small';
                 leftPos = Math.random() * config.viewport.width - config.viewport.width / 2 + config.asteroid.spacing;
                 topPos = config.asteroid.top;
-                acc = Math.random() * (config.asteroid.maxAcc - config.asteroid.minAcc + 1) + config.asteroid.minAcc;
+                acc = Math.random() * (this.maxAcc - this.minAcc + 1) + this.minAcc;
             }
 
             // if it overflows on the right side, add difference + spacing
@@ -58,7 +59,6 @@ define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game
                 height: config.asteroid[size].height
             });
 
-            // Random float number between 2 and 5
             asteroid.acc = acc;
             asteroid.size = size;
 
@@ -96,18 +96,25 @@ define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game
                 // Reset step counter
                 difficultyCounter = 0;
 
+                // Increase difficulty by either increasing min/max number of generating new one or increasing their min/max acceleration. 25% change each.
                 if (Math.random() > 0.5) {
-                    _this.minNumber++;
-                    log('Increased min number');
+                    if (Math.random() > 0.5) {
+                        _this.minNumber++;
+                    } else {
+                        _this.maxNumber++;
+                    }
                 } else {
-                    _this.maxNumber++;
-                    log('Increased max number');
+                    if (Math.random() > 0.5) {
+                        _this.minAcc++;
+                    } else {
+                        _this.maxAcc++;
+                    }
                 }
             })();
         });
 
         game.on('step', function () {
-            _this.instances.some(function (asteroid) {
+            _this.instances.forEach(function (asteroid) {
                 asteroid.setPosition(asteroid.left, asteroid.top + asteroid.acc);
                 // Remove meteor if it's not visible
                 _this.checkOverflow(asteroid);
@@ -142,6 +149,7 @@ define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game
             // });
 
             if (asteroid.size === 'big') {
+                // Generate new, small asteroids after destroing big one
                 _this.generateAsteroids(Math.ceil(Math.random() * config.asteroid.maxReplicateNumber), asteroid);
             }
         });
@@ -150,8 +158,6 @@ define(['config', 'game', 'scene', 'viewport', 'sounds'], function (config, game
             asteroid.destroy();
         });
     };
-
-    // TODO: Add super powers (tripple shot, fast shot, bomb)
 
     return asteroids;
 });

@@ -2,7 +2,5 @@
 'use strict';
 
 define(function () {
-    var scene = new Engine.Scene();
-
-    return scene;
+    return new Engine.Scene();
 });

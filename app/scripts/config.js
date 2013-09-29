@@ -2,104 +2,127 @@
 'use strict';
 
 define(function () {
-    var config = {};
+    return {
+        viewport: {
+            width: 600,
+            height: 800,
+            background: '#000'
+        },
 
-    // TODO: Comment code and config
+        background: {
+            width: 2,
+            height: 2,
+            color: '#fff',
+            // Number of sparkles
+            count: 500,
+            // Number of sparkles which opacity change every timer step
+            animationCount: 5
+        },
 
-    config.viewport = {
-        width: 600,
-        height: 800,
-        background: '#000'
-    };
+        keys: {
+            enter: 'ENTER',
+            pause: 'P',
+            left: 'ARROW_LEFT',
+            right: 'ARROW_RIGHT',
+            up: 'ARROW_UP',
+            down: 'ARROW_DOWN',
+            shoot: 'SPACE'
+        },
 
-    config.background = {
-        width: 2,
-        height: 2,
-        color: '#fff',
-        count: 500
-    };
-
-    config.ship = {
-        red: {
-            width: 99,
-            height: 75,
-            assets: {
-                default: 'image(images/player-red.png)',
-                left: 'image(images/player-red-left.png)',
-                right: 'image(images/player-red-right.png)'
+        ship: {
+            red: {
+                width: 99,
+                height: 75,
+                assets: {
+                    default: 'image(images/player-red.png)',
+                    left: 'image(images/player-red-left.png)',
+                    right: 'image(images/player-red-right.png)'
+                },
+                particlesColor: 'rgb(185, 75, 75) 3px 3px'
             },
-            particlesColor: 'rgb(185, 75, 75) 3px 3px'
-        },
-        green: {
-            width: 98,
-            height: 50,
-            assets: {
-                default: 'image(images/player-green.png)',
-                left: 'image(images/player-green-left.png)',
-                right: 'image(images/player-green-right.png)'
+            green: {
+                width: 98,
+                height: 50,
+                assets: {
+                    default: 'image(images/player-green.png)',
+                    left: 'image(images/player-green-left.png)',
+                    right: 'image(images/player-green-right.png)'
+                },
+                particlesColor: 'rgb(160, 200, 100) 3px 3px'
             },
-            particlesColor: 'rgb(160, 200, 100) 3px 3px'
+            // Initial position of ship
+            lastPosition: {
+                x: -38,
+                y: 310
+            },
+            // Ship acceleration
+            acc: 10,
+            // Number of lives
+            lives: 3,
+            // Respawn delay
+            respawnDelay: 2000
         },
-        lastPosition: {
-            x: -38,
-            y: config.viewport.height / 2 - 90
-        },
-        acc: 10,
-        bulletAcc: 20,
-        lives: 3
-    };
 
-    config.bullet = {
-        width: 9,
-        height: 33,
-        asset: {
-            red: 'image(images/laser-red.png)',
-            green: 'image(images/laser-green.png)'
-        },
-        acc: 20
-    };
-
-    config.asteroid = {
-        small: {
-            width: 44,
-            height: 42,
-            asset: 'image(images/meteor-small.png)',
-            points: 20
-        },
-        big: {
-            width: 136,
-            height: 111,
-            asset: 'image(images/meteor-big.png)',
-            points: 50
-        },
-        top: -config.viewport.height / 2 - 20,
-        // Screen spacing from left and right side
-        spacing: 15,
-        minNumber: 3,
-        maxNumber: 5,
-        minAcc: 3,
-        maxAcc: 5,
-        // 20% chance of generating big asteroid
-        chance: 0.2,
-        maxReplicateNumber: 5,
-        // Generate new asteroids every 3 seconds
-        generateDelay: 3,
-        // Increase difficulty every 10 seconds
-        changeDifficultyDelay: 10
-    };
-
-    config.ui = {
-        life: {
-            width: 35,
-            height: 27,
+        bullet: {
+            width: 9,
+            height: 33,
             asset: {
-                red: 'image(images/life-red.png)',
-                green: 'image(images/life-green.png)'
+                red: 'image(images/laser-red.png)',
+                green: 'image(images/laser-green.png)'
             },
-            y: 20,
-            x: 20
+            // Bullet acceleration
+            acc: 20,
+            // Interval between auto-shooting while shoot key is pressed
+            shootingInterval: 200,
+        },
+
+        asteroid: {
+            small: {
+                width: 44,
+                height: 42,
+                asset: 'image(images/meteor-small.png)',
+                points: 20
+            },
+            big: {
+                width: 136,
+                height: 111,
+                asset: 'image(images/meteor-big.png)',
+                points: 50
+            },
+            // Initial asteroids position
+            top: -380,
+            // Screen spacing from left and right side
+            spacing: 15,
+            // Min number of generated asteroids
+            minNumber: 3,
+            // Max number of generated asteroids
+            maxNumber: 5,
+            // Min acceleration of asteroids
+            minAcc: 3,
+            // Max acceleration of asteroids
+            maxAcc: 5,
+            // Chance of generating big asteroid in %
+            chance: 0.20,
+            // Max number of asteroids generated after destroing big one
+            maxReplicateNumber: 5,
+            // Delay between generation new asteroids in seconds
+            generateDelay: 3,
+            // Time between increasing difficulty in seconds. Difficulty increase by either increasing min/max of asteroids number of their acceleration. 25% chance each.
+            changeDifficultyDelay: 10
+        },
+
+        ui: {
+            life: {
+                width: 35,
+                height: 27,
+                asset: {
+                    red: 'image(images/life-red.png)',
+                    green: 'image(images/life-green.png)'
+                },
+                // Position of life icons
+                y: 20,
+                x: 20
+            }
         }
     };
-
-    return config;
 });

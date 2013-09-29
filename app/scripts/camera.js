@@ -2,9 +2,7 @@
 'use strict';
 
 define(['scene'], function (scene) {
-    var camera = new Engine.Camera({
+    return new Engine.Camera({
         lookAt: scene
     });
-
-    return camera;
 });

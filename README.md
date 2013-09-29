@@ -1,5 +1,14 @@
 # Galaxy Shooter
 
+#### Changelog 29.09
+* Temporarily turned off particles effect on asteroids/ship destroy as it caused big performance issues
+* Added scoreboard
+* Added handling all game screens (start, restart, ship choosing) using keys
+* Moved everything to commented config file
+* Commented whole code
+* Refactored few things
+* Fixed few bugs
+
 #### Changelog 26.09
 * Added ship choose screen
 * Added second ship
