@@ -25,3 +25,5 @@ __Demo:__ http://kamilogorek.pl/lab/galaxy-shooter/app/
 
 ### Game Engine by [Solpeo](http://solpeo.com)
 ### Art and Audio by [Kenney Vleugels](http://kenney.nl)
+
+#### License: MIT
